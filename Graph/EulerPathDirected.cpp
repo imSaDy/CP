@@ -50,16 +50,16 @@ const int inf = 1e9 + 1;
 const int alp = 31; 
 const ll INF = 1e17; 
 
-vector<int> euler_tour(int n, vector<vector<pair<int,int>>>& g, int start) {
+vector<int> euler_tour(int n, int m, vector<vector<pair<int,int>>>& g, int start) {
     vector<int> tour;
-    vector<bool> used_edge;
-    used_edge.assign(g.size() * 2, false);
+    vector<bool> used_edge(m, false); // size = number of edges
     
     stack<int> st;
     st.push(start);
 
     while (!st.empty()) {
         int u = st.top();
+        // Remove used edges from adjacency
         while (!g[u].empty() && used_edge[g[u].back().second]) {
             g[u].pop_back();
         }
@@ -81,36 +81,37 @@ vector<int> euler_tour(int n, vector<vector<pair<int,int>>>& g, int start) {
 }
 
 int n, m;
-vvp g;
-
+vvp g, gr;
 
 int main(){
     ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0); 
     cin >> n >> m;
     g.resize(n + 1);
+    gr.resize(n + 1);
     for (int i = 0; i < m; i++){
         int u, v; 
         cin >> u >> v; 
         g[u].pb({v, i});
-        g[v].pb({u, i});
-    } 
+        gr[v].pb({u, i});
+    }
     bool ok = true; 
     for (int i = 1; i <= n; i++){
-        if (len(g[i]) & 1){
-            ok = false; 
-            break;
+        if (i == 1){
+            if (len(g[i]) != len(gr[i]) + 1) ok = false;
+        }
+        else if (i == n){
+            if (len(g[i]) != len(gr[i]) - 1) ok = false;
+        }
+        else {
+            if (len(g[i]) != len(gr[i])) ok = false; 
         }
     }
-    if (!ok){
+    vi tour = euler_tour(n, m, g, 1);
+    if (len(tour) != m + 1 || tour.back() != n || !ok)
         return cout << "IMPOSSIBLE", 0;
-    }
-    int start = 1; 
-    vi tour = euler_tour(n, g, start); 
-    if (len(tour) != m + 1)
-        return cout << "IMPOSSIBLE", 0;
-    for (auto u : tour) cout << u << " ";
-
+    for (auto v : tour) cout << v << " ";
 }
+
 
 /*
     remember to check the existance conditions of euler tour...

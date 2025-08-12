@@ -50,16 +50,43 @@ const int inf = 1e9 + 1;
 const int alp = 31; 
 const ll INF = 1e17; 
 
-vector<int> euler_tour(int n, vector<vector<pair<int,int>>>& g, int start) {
+int n;
+string res;
+unordered_set<string> used;
+
+void dfs(string node) {
+    for (char c : {'0', '1'}) {
+        string edge = node + c;
+        if (!used.count(edge)) {
+            used.insert(edge);
+            dfs(edge.substr(1)); // move to suffix of length n-1
+            res.push_back(c);
+        }
+    }
+}
+
+int main() {
+    cin >> n;
+    string start(n - 1, '0');
+    dfs(start);
+    res += start; // append starting (n-1) zeros
+    reverse(res.begin(), res.end());
+    cout << res << "\n";
+}
+
+
+// second solution
+
+vector<int> euler_tour(int n, int m, vector<vector<pair<int,int>>>& g, int start) {
     vector<int> tour;
-    vector<bool> used_edge;
-    used_edge.assign(g.size() * 2, false);
+    vector<bool> used_edge(m, false); // size = number of edges
     
     stack<int> st;
     st.push(start);
 
     while (!st.empty()) {
         int u = st.top();
+        // Remove used edges from adjacency
         while (!g[u].empty() && used_edge[g[u].back().second]) {
             g[u].pop_back();
         }
@@ -83,35 +110,25 @@ vector<int> euler_tour(int n, vector<vector<pair<int,int>>>& g, int start) {
 int n, m;
 vvp g;
 
-
 int main(){
     ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0); 
-    cin >> n >> m;
-    g.resize(n + 1);
-    for (int i = 0; i < m; i++){
-        int u, v; 
-        cin >> u >> v; 
-        g[u].pb({v, i});
-        g[v].pb({u, i});
-    } 
-    bool ok = true; 
-    for (int i = 1; i <= n; i++){
-        if (len(g[i]) & 1){
-            ok = false; 
-            break;
+    cin >> n;
+    g.resize(1 << n);
+    int id = 0; 
+    for (int i = 0; i < (1 << n); i++){
+        int u = i >> 1; 
+        int v = i; 
+        if (v > (1 << (n - 1))){
+            v -= (1 << (n - 1));
         }
+        g[u].pb(MP(v, id++));
     }
-    if (!ok){
-        return cout << "IMPOSSIBLE", 0;
+    vi tour = euler_tour(1 << n, 1 << n, g, 0);
+    for (int i = 0; i < n - 1; i++){
+        cout << 0;
     }
-    int start = 1; 
-    vi tour = euler_tour(n, g, start); 
-    if (len(tour) != m + 1)
-        return cout << "IMPOSSIBLE", 0;
-    for (auto u : tour) cout << u << " ";
-
+    for (int i = 1; i < len(tour); i++){
+        cout << (tour[i] & 1);
+    }
 }
 
-/*
-    remember to check the existance conditions of euler tour...
-*/

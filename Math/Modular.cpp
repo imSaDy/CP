@@ -77,6 +77,20 @@ template<int MOD, int RT> struct mint {
 const int MOD = 1e9 + 7; // or 998244353
 using Mint = mint<MOD, 5>; // 5 is a primitive root for common moduli
 
+vector<Mint> fact(1, 1);
+vector<Mint> invfact(1, 1);
+ 
+Mint C(int n, int k) {
+    if (k < 0 || k > n) {
+        return 0;
+    }
+    while ((int) fact.size() < n + 1) {
+        fact.push_back(fact.back() * (int) fact.size());
+        invfact.push_back(1 / fact.back());
+    }
+    return fact[n] * invfact[k] * invfact[n - k];
+}
+
 // Example usage
 int main() {
     Mint a = 2, b = 3;

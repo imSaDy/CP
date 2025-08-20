@@ -91,8 +91,17 @@ Mint C(int n, int k) {
     return fact[n] * invfact[k] * invfact[n - k];
 }
 
+const int maxn = 2e3; 
+Mint c[maxn][maxn]; // O(1) binomial...
+
 // Example usage
 int main() {
+    for(int i = 0; i < maxn; i++){
+        c[i][0] = 1;
+        for(int j = 1; j <= i; j++){
+            c[i][j] = (c[i - 1][j - 1] + c[i - 1][j]);
+        }
+    }
     Mint a = 2, b = 3;
     cout << a + b << endl; // (2 + 3) % MOD = 5
     cout << a * b << endl; // (2 * 3) % MOD = 6

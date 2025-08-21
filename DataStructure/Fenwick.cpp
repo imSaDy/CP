@@ -54,25 +54,41 @@ template<typename T>
 struct Fenwick {
     int n;
     vector<T> bit;
- 
+
     Fenwick(int n) : n(n) {
         bit.assign(n + 1, 0);
     }
- 
+
     void add(int idx, T val) { // 1-based index
         for (; idx <= n; idx += idx & -idx)
             bit[idx] += val;
     }
- 
+
     T sum(int idx) { // prefix sum [1..idx]
         T res = 0;
         for (; idx > 0; idx -= idx & -idx)
             res += bit[idx];
         return res;
     }
- 
+
     T get(int l, int r) { // inclusive
         return sum(r) - sum(l - 1);
+    }
+
+    // smallest index idx such that sum(idx) >= target
+    int lower_bound(T target) {
+        int idx = 0;
+        T accumulated = 0;
+        // largest power of two <= n
+        int maxPow = 1;
+        while (maxPow <= n) maxPow <<= 1;
+        for (int step = maxPow; step > 0; step >>= 1) {
+            if (idx + step <= n && accumulated + bit[idx + step] < target) {
+                accumulated += bit[idx + step];
+                idx += step;
+            }
+        }
+        return idx + 1; // 1-based index
     }
 };
  
